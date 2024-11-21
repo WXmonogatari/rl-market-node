@@ -1,4 +1,4 @@
-import pool from "./index.js";
+import pool from './index.js'
 
 const execTranstion = (sqlArr) => {
     return new Promise((resolve, reject) => {

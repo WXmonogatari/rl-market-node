@@ -1,8 +1,13 @@
 import mysql from 'mysql'
+import dotenv from 'dotenv'
+
+const node_env = process.env.NODE_ENV || 'development'
+const config = dotenv.config({ path: `.env.${node_env}` })
 const pool = mysql.createPool({
-    user: 'root',
-    password: 'Yhx1120.',
-    host: '8.138.56.101',
+    user: process.env.DB_username,
+    password: process.env.DB_password,
+    port: 3306,
+    host: process.env.DB_URL,
     database: 'market_db',
     multipleStatements: true
 })

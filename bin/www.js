@@ -1,14 +1,14 @@
 import express from 'express'
 import cors from "cors"
+import dotenv from "dotenv"
+
 const app = express()
-export const port = 8023
-let server = app.listen(port, () => {
-    let host = server.address().address
-    let port = server.address().port
-    if (host === '::') {
-        host = 'localhost:'
-    }
-    console.log('访问地址', host , port)
+const node_env = process.env.NODE_ENV || 'development'
+const config = dotenv.config({ path: `.env.${node_env}` })
+const port = process.env.PORT
+let server = app.listen(port, '0.0.0.0',() => {
+    const { address, port } = server.address()
+    console.log('访问地址', address , port)
 })
 
 app.use(cors())
