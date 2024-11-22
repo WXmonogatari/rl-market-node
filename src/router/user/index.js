@@ -1,25 +1,26 @@
 import express from "express"
+const router = express.Router()
 import execTranstion from "../../db/execTranstion.js"
 import * as fs from "fs"
 import multer from 'multer'
 import path from 'path'
+import { fileURLToPath } from 'url'
+import dotenv from "dotenv"
 
-const router = express.Router()
-
+const node_env = process.env.NODE_ENV || 'development'
+const config = dotenv.config({ path: `.env.${node_env}` })
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'D:/rl-market/user/avatar'); // 修改为希望保存的文件夹路径
+        cb(null, config.parsed.uploadPath); // 修改为希望保存的文件夹路径
     },
     filename: (req, file, cb) => {
         cb(null, `${file.originalname}`); // 生成唯一文件名
     }
 })
-
 const upload = multer({ storage: storage })
-// const upload = multer({
-//     dest: '/rl-market/user/avatar'
-// })
-
+const __filename = fileURLToPath(import.meta.url)
+// console.log(__filename)
+router.use('/upload/avatar', express.static(config.parsed.uploadPath))
 
 // 获取全部留言数据
 router.get('/getMessage', (req, res) => {
@@ -212,8 +213,9 @@ router.delete('/deleteAllMessage/:user_id', (req, res) => {
 })
 
 // 上传用户头像
-router.post('/uploadAvatar', upload.single('avatar'), (req, res) => {
-    const { id, username } = req.body
+router.put('/uploadAvatar/:id', upload.single('avatar'), (req, res) => {
+    const { id } = req.params
+    const { username } = req.body
     const file = req.file
     let oldSource = ''
     let newSource = ''
@@ -227,8 +229,8 @@ router.post('/uploadAvatar', upload.single('avatar'), (req, res) => {
         })
     }
     if (username && file) {
-        oldSource = `D:\\rl-market\\user\\avatar\\${file.originalname}`
-        newSource = `D:\\rl-market\\user\\avatar\\${id}-${username}-${file.originalname}`
+        oldSource = path.join(config.parsed.uploadPath, file.originalname)
+        newSource = path.join(config.parsed.uploadPath, `${id}-${username}-${file.originalname}`)
         fs.renameSync(oldSource, newSource)
         sql = 'UPDATE user_tb SET username = ?, avatar = ? WHERE id = ?'
         values = [username, newSource, id]
@@ -236,8 +238,8 @@ router.post('/uploadAvatar', upload.single('avatar'), (req, res) => {
         sql = 'UPDATE user_tb SET username = ? WHERE id = ?'
         values = [username, id]
     } else if (file) {
-        oldSource = `D:\\rl-market\\user\\avatar\\${file.originalname}`
-        newSource = `D:\\rl-market\\user\\avatar\\${id}-${username}-${file.originalname}`
+        oldSource = path.join(config.parsed.uploadPath, file.originalname)
+        newSource = path.join(config.parsed.uploadPath, `${id}-${username}-${file.originalname}`)
         fs.renameSync(oldSource, newSource)
         sql = 'UPDATE user_tb SET avatar = ? WHERE id = ?'
         values = [newSource, id]

@@ -3,7 +3,7 @@ import dotenv from 'dotenv'
 
 const node_env = process.env.NODE_ENV || 'development'
 const config = dotenv.config({ path: `.env.${node_env}` })
-console.log('测试部署更新3')
+
 const pool = mysql.createPool({
     user: process.env.DB_username,
     password: process.env.DB_password,
