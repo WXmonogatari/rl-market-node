@@ -254,6 +254,11 @@ router.put('/uploadAvatar/:id', upload.single('avatar'), (req, res) => {
                 code: 1,
                 message: '修改成功'
             })
+        } else {
+            res.send({
+                code: 0,
+                message: '修改失败'
+            })
         }
     })
 })
