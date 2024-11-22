@@ -210,11 +210,11 @@ router.delete('/deleteAllMessage/:user_id', (req, res) => {
 // 上传用户头像
 router.put('/uploadAvatar/:id', upload.single('avatar'), (req, res) => {
     const { id } = req.params
-    const { username } = req.body
+    const { username, newUsername } = req.body
     const file = req.file
     let oldSource = ''
     let newSource = ''
-    let handleFileName = ''
+    let handleFileName = `${id}-${username}-${file.originalname}`
     let sql = ''
     let values = []
 
@@ -224,17 +224,18 @@ router.put('/uploadAvatar/:id', upload.single('avatar'), (req, res) => {
             message: '修改失败'
         })
     }
-    if (username && file) {
-        handleFileName = `${id}-${username}-${file.originalname}`
+    /*---------------测试自动部署----------------*/
+    if (!Object.is(username, newUsername) && file) { // 修改用户名和头像
+        handleFileName = `${id}-${newUsername}-${file.originalname}`
         oldSource = path.join(config.parsed.uploadPath, file.originalname)
         newSource = path.join(config.parsed.uploadPath, handleFileName)
         fs.renameSync(oldSource, newSource)
         sql = 'UPDATE user_tb SET username = ?, avatar = ? WHERE id = ?'
         values = [username, handleFileName, id]
-    } else if (username) {
+    } else if (!Object.is(username, newUsername) && !file) { // 只修改名字
         sql = 'UPDATE user_tb SET username = ? WHERE id = ?'
-        values = [username, id]
-    } else if (file) {
+        values = [newUsername, id]
+    } else if (Object.is(username, newUsername) && file) { // 只修改头像
         oldSource = path.join(config.parsed.uploadPath, file.originalname)
         newSource = path.join(config.parsed.uploadPath, handleFileName)
         fs.renameSync(oldSource, newSource)
