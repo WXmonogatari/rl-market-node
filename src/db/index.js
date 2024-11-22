@@ -5,10 +5,10 @@ const node_env = process.env.NODE_ENV || 'development'
 const config = dotenv.config({ path: `.env.${node_env}` })
 
 const pool = mysql.createPool({
-    user: process.env.DB_username,
-    password: process.env.DB_password,
+    user: config.parsed.DB_username,
+    password: config.parsed.DB_password,
     port: 3306,
-    host: process.env.DB_URL,
+    host: config.parsed.DB_URL,
     database: 'market_db',
     multipleStatements: true
 })
