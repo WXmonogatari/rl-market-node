@@ -230,7 +230,7 @@ router.put('/uploadAvatar/:id', upload.single('avatar'), (req, res) => {
         newSource = path.join(config.parsed.uploadPath, handleFileName)
         fs.renameSync(oldSource, newSource)
         sql = 'UPDATE user_tb SET username = ?, avatar = ? WHERE id = ?'
-        values = [username, `${id}-${username}-${file.originalname}`, id]
+        values = [username, handleFileName, id]
     } else if (username) {
         sql = 'UPDATE user_tb SET username = ? WHERE id = ?'
         values = [username, id]
@@ -239,7 +239,7 @@ router.put('/uploadAvatar/:id', upload.single('avatar'), (req, res) => {
         newSource = path.join(config.parsed.uploadPath, handleFileName)
         fs.renameSync(oldSource, newSource)
         sql = 'UPDATE user_tb SET avatar = ? WHERE id = ?'
-        values = [`${id}-${username}-${file.originalname}`, id]
+        values = [handleFileName, id]
     }
 
     let sqlArr = [
