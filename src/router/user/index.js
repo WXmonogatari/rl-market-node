@@ -200,7 +200,6 @@ router.delete('/deleteAllMessage/:user_id', (req, res) => {
             })
         }
     }).catch((error) => {
-        console.log(error)
         res.send({
             code: 0,
             message: '删除失败'
@@ -215,6 +214,7 @@ router.put('/uploadAvatar/:id', upload.single('avatar'), (req, res) => {
     const file = req.file
     let oldSource = ''
     let newSource = ''
+    let handleFileName = ''
     let sql = ''
     let values = []
 
@@ -225,20 +225,21 @@ router.put('/uploadAvatar/:id', upload.single('avatar'), (req, res) => {
         })
     }
     if (username && file) {
+        handleFileName = `${id}-${username}-${file.originalname}`
         oldSource = path.join(config.parsed.uploadPath, file.originalname)
-        newSource = path.join(config.parsed.uploadPath, `${id}-${username}-${file.originalname}`)
+        newSource = path.join(config.parsed.uploadPath, handleFileName)
         fs.renameSync(oldSource, newSource)
         sql = 'UPDATE user_tb SET username = ?, avatar = ? WHERE id = ?'
-        values = [username, newSource, id]
+        values = [username, `${id}-${username}-${file.originalname}`, id]
     } else if (username) {
         sql = 'UPDATE user_tb SET username = ? WHERE id = ?'
         values = [username, id]
     } else if (file) {
         oldSource = path.join(config.parsed.uploadPath, file.originalname)
-        newSource = path.join(config.parsed.uploadPath, `${id}-${username}-${file.originalname}`)
+        newSource = path.join(config.parsed.uploadPath, handleFileName)
         fs.renameSync(oldSource, newSource)
         sql = 'UPDATE user_tb SET avatar = ? WHERE id = ?'
-        values = [newSource, id]
+        values = [`${id}-${username}-${file.originalname}`, id]
     }
 
     let sqlArr = [
@@ -252,7 +253,8 @@ router.put('/uploadAvatar/:id', upload.single('avatar'), (req, res) => {
         if (result[0].rows.affectedRows > 0) {
             res.send({
                 code: 1,
-                message: '修改成功'
+                message: '修改成功',
+                avatarUrl: handleFileName
             })
         } else {
             res.send({
