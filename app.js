@@ -3,10 +3,12 @@ import jwt from "jsonwebtoken"
 import login from './src/router/login/index.js'
 import user from './src/router/user/index.js'
 import { createToken, SECRECT_KEY } from "./src/utils/token.js"
+import express from "express";
 
 app.get('/', (req, res) => {
     res.send('Hello World')
 })
+
 app.all('*', (req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*')
     res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS')
@@ -47,5 +49,7 @@ app.get('/refresh_token',(req,res) => {
         res.send(errMsg);
     }
 })
+
+app.use('/static', express.static('upload/avatar'))
 app.use('/login', login)
 app.use('/user', user)

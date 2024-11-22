@@ -4,7 +4,6 @@ import execTranstion from "../../db/execTranstion.js"
 import * as fs from "fs"
 import multer from 'multer'
 import path from 'path'
-import { fileURLToPath } from 'url'
 import dotenv from "dotenv"
 
 const node_env = process.env.NODE_ENV || 'development'
@@ -18,9 +17,6 @@ const storage = multer.diskStorage({
     }
 })
 const upload = multer({ storage: storage })
-const __filename = fileURLToPath(import.meta.url)
-// console.log(__filename)
-router.use('/upload/avatar', express.static(config.parsed.uploadPath))
 
 // 获取全部留言数据
 router.get('/getMessage', (req, res) => {
