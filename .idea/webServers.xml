@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="0bea4f44-8fc7-4668-bbd8-b13805bca0aa" name="rl-market-node-autoUpdate">
+        <fileTransfer rootFolder="/production-projects" accessType="SFTP" host="8.138.56.101" port="22" sshConfigId="862801a1-4775-4584-b3e8-5b9caf985e5b" sshConfig="root@8.138.56.101:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
