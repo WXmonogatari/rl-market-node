@@ -2,7 +2,7 @@ import app from './bin/www.js'
 import jwt from "jsonwebtoken"
 import login from './src/router/login/index.js'
 import user from './src/router/user/index.js'
-import { createToken, SECRECT_KEY } from "./src/utils/token.js"
+import { createToken, SECRET_KEY } from "./src/utils/token.js"
 import express from "express";
 
 app.get('/', (req, res) => {
@@ -19,34 +19,49 @@ app.all('*', (req, res, next) => {
     next()
 })
 
-app.get('/refresh_token',(req,res) => {
+// 刷新token 以长换短
+app.get('/refresh_token', (req,res) => {
     const authorization = req.headers.authorization
     const errMsg = {
         code: 401,
         msg: "Unauthorized"
     }
-    if (!authorization) return res.send(errMsg)
+    if (!authorization) return res.status(401).send(errMsg)
     const token = authorization.replace('Bearer ', '')
     try {
-        const decoded = jwt.verify(token, SECRECT_KEY);
+        const decoded = jwt.verify(token, SECRET_KEY)
         if (decoded.token_type !== "REFRESH_TOKEN") {
             res.send(errMsg);
-            return;
+            return
         }
         let newToken = createToken();
         res.send({
-            code: 0,
-            msg: '',
-            data: {
-                content: "刷新token成功",
-                token: newToken,
-            },
+            code: 1,
+            msg: '刷新token成功',
+            token: newToken
         });
-    } catch {
-        res.send(errMsg);
+    } catch (error) {
+        console.log(error)
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).send({ code: 0, msg: "无效的token" });
+        } else if (error.name === 'TokenExpiredError') {
+            return res.status(401).send({ code: -1, msg: "token已过期" });
+        } else {
+            return res.status(500).send({ code: 500, msg: "服务器错误" });
+        }
     }
 })
 
+// 设置请求超时时间
+app.use((req, res, next) => {
+    res.setTimeout(10000, () => {
+        console.log('Request Timeout!!!')
+        res.status(408).send({
+            message: '请求超时'
+        })
+    })
+    next()
+})
 app.use('/static', express.static('upload/avatar'))
 app.use('/login', login)
 app.use('/user', user)

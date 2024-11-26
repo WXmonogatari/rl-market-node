@@ -4,7 +4,7 @@ import execTranstion from "../../db/execTranstion.js";
 import { createRefreshToken, createToken } from "../../utils/token.js";
 import { randomUsername } from "../../utils/generateUsername.js";
 
-const router = express.Router()
+/* express路由 */ const router = express.Router()
 
 // 登录
 router.post('/login',(req, res) => {
@@ -24,7 +24,7 @@ router.post('/login',(req, res) => {
     execTranstion(sqlArr).then(result => {
         const rows = result[0].rows[0]
         if (rows) {
-            const { id, phone_number, identity_number, username, password: passwordHash, salt, avatar, email, default_theme, admin } = rows
+            const { id, phone_number, identity_number, username, password: passwordHash, salt, avatar, email, default_theme, fold, admin } = rows
             if (verifyPassword(password, passwordHash, salt)) {
                 const data = {
                     id: id,
@@ -34,6 +34,7 @@ router.post('/login',(req, res) => {
                     avatar: avatar,
                     email: email,
                     default_theme: default_theme,
+                    fold: fold,
                     admin: admin
                 }
                 let token = createToken()
@@ -80,7 +81,7 @@ router.post('/register', (req, res) => {
     ]
     let sqlArr2 = [
         {
-            sql: 'INSERT INTO user_tb(phone_number, username, password, salt, default_theme, admin) VALUES (?, ?, ?, ?, false, false)',
+            sql: 'INSERT INTO user_tb(phone_number, username, password, salt, default_theme, fold, admin) VALUES (?, ?, ?, ?, false, false, false)',
             values: [phone_number, randomUsername(phone_number), passwordHash, salt]
         }
     ]
